@@ -5,7 +5,7 @@
 // @name:zh-TW   NYCU E3 介面最佳化
 // @name:zh      NYCU E3 介面最佳化
 // @namespace    http://tampermonkey.net/
-// @version      1.2.1
+// @version      1.2.2
 // @description  強化 NYCU E3 全站介面與操作體驗。
 // @description:en  Improve NYCU E3 full-site UI/UX.
 // @description:zh-CN  强化 NYCU E3 全站介面与操作体验。
@@ -26,7 +26,7 @@
 
 	// 嘗試載入 CSS。如果失敗的話代表可能是使用 dev.js 在跑，交給他就好。
 	try {
-		GM_addStyle("@import url('https://g.elvismao.com/nycu-e4/index.css');@import url('https://g.elvismao.com/nycu-e4/home.css');");
+		GM_addStyle("@import url('https://g.elvismao.com/nycu-em3/index.css');@import url('https://g.elvismao.com/nycu-em3/home.css');");
 	} catch (err) {
 		console.warn("[TM] Failed to load external CSS, maybe you're in dev mode.");
 	}
@@ -55,14 +55,14 @@
 		navbar.querySelector(".navbar-toggler")?.remove();
 
 		document.querySelector("nav .navbar-brand").innerHTML = `
-			<img src="https://g.elvismao.com/nycu-e4/e3.svg" alt="E3 Logo" style="height:32px; margin-right:8px;">
+			<img src="https://g.elvismao.com/nycu-em3/e3.svg" alt="E3 Logo" style="height:32px; margin-right:8px;">
 			<span style="font-weight:700;">NYCU E3</span>
 		`;
 
 		// set favicon
 		const favicon = document.querySelector('link[rel="icon"]') || document.createElement("link");
 		favicon.rel = "icon";
-		favicon.href = "https://g.elvismao.com/nycu-e4/e3.svg";
+		favicon.href = "https://g.elvismao.com/nycu-em3/e3.svg";
 		document.head.appendChild(favicon);
 
 		// 升級 Gravatar 解析度（頭像 img）
