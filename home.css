@@ -5,7 +5,7 @@
 
 .e3rp-main {
 	width: min(1220px, calc(100vw - 48px));
-	margin: 34px auto 56px;
+	margin: 112px auto 56px;
 	display: grid;
 	grid-template-columns: 1.2fr 1fr;
 	gap: 34px;
@@ -144,6 +144,7 @@
 	transform: translateY(-1px);
 	border-color: var(--dawn-highlight-high);
 	background: var(--dawn-highlight-low);
+	text-decoration: none;
 }
 
 .e3rp-announcements {
@@ -155,12 +156,19 @@
 .e3rp-announcement {
 	padding: 14px 16px;
 	border-radius: 16px;
-	background: rgba(255, 255, 255, 0.28);
 	border: 1px solid transparent;
+	display: block;
+	transition: background-color 0.15s ease;
+}
+
+.e3rp-announcement:hover,
+.e3rp-event:hover {
+	text-decoration: none;
+	background-color: var(--dawn-highlight-low);
 }
 
 .e3rp-announcement + .e3rp-announcement {
-	margin-top: 12px;
+	margin-top: 8px;
 }
 
 .e3rp-announcement-meta {
@@ -240,6 +248,7 @@
 	padding: 14px 16px;
 	border-radius: 16px;
 	background: rgba(255, 255, 255, 0.28);
+	transition: background-color 0.15s ease;
 }
 
 .e3rp-event + .e3rp-event {
@@ -291,7 +300,6 @@
 @media (max-width: 640px) {
 	.e3rp-main {
 		width: min(100vw - 20px, 1220px);
-		margin-top: 22px;
 		gap: 22px;
 	}
 

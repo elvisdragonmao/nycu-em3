@@ -200,3 +200,44 @@ tr:hover td {
 	background-color: transparent !important;
 	border: none !important;
 }
+
+.aabtn.focus,
+.aabtn:focus,
+.btn-link.focus,
+.btn-link:focus,
+.nav-link.focus,
+.nav-link:focus,
+.editor_atto_toolbar button.focus,
+.editor_atto_toolbar button:focus,
+.editor_atto_toolbar .atto_toolbar_row.focus,
+.editor_atto_toolbar .atto_toolbar_row:focus,
+[role="button"].focus,
+[role="button"]:focus,
+.list-group-item-action.focus,
+.list-group-item-action:focus,
+input[type="checkbox"].focus,
+input[type="checkbox"]:focus,
+input[type="radio"].focus,
+input[type="radio"]:focus,
+input[type="file"].focus,
+input[type="file"]:focus,
+input[type="image"].focus,
+input[type="image"]:focus,
+.sr-only-focusable.focus,
+.sr-only-focusable:focus,
+a.dropdown-toggle.focus,
+a.dropdown-toggle:focus,
+.moodle-dialogue-base .closebutton.focus,
+.moodle-dialogue-base .closebutton:focus,
+button.btn-close.focus,
+button.btn-close:focus,
+.form-autocomplete-selection.focus,
+.form-autocomplete-selection:focus,
+[role="treeitem"]:not([aria-expanded="true"]).focus,
+[role="treeitem"]:not([aria-expanded="true"]):focus {
+	box-shadow: none;
+}
+
+.navbar.navbar-dark.bg-primary .nav-link i.icon {
+	color: var(--dawn-text) !important;
+}

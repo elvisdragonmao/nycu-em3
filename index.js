@@ -33,15 +33,23 @@
 
 	const path = location.pathname.replace(/\/+$/, "") || "/";
 	const isDashboard = location.origin === "https://e3p.nycu.edu.tw" && (path === "/my" || path === "/my/index.php");
+	const isEnglish = new URLSearchParams(location.search).get("lang") === "en" || (document.documentElement.lang || "").startsWith("en");
 
-	window.addEventListener("DOMContentLoaded", () => {
+	function boot() {
 		try {
+			console.log(`[TM] NYCU E3 UI Plus loaded. Dashboard: ${isDashboard}, English: ${isEnglish}`);
 			patchNavbar();
 			if (isDashboard) initDashboard();
 		} catch (err) {
 			console.error("[TM] Error in main execution:", err);
 		}
-	});
+	}
+
+	if (document.readyState === "loading") {
+		document.addEventListener("DOMContentLoaded", boot, { once: true });
+	} else {
+		boot();
+	}
 
 	// --- tool functions ---
 
@@ -115,6 +123,7 @@
 			avatar,
 			notificationCount,
 			lang,
+			isEnglish,
 			profileName,
 			country,
 			englishName,
@@ -128,7 +137,17 @@
 	}
 
 	function parseCourses() {
-		const nodes = [...document.querySelectorAll("#layer2_right_current_course_stu a.course-link")];
+		// 優先抓右側主課程清單；若只有一個學期，再補入左側 sidebar（可能包含舊學期）
+		const rightNodes = [...document.querySelectorAll("#layer2_right_current_course_stu a.course-link")];
+		const leftNodes = [...document.querySelectorAll("#layer2_right_current_course_left a.course-link")];
+
+		// 右側已有的 href set，用來去重
+		const rightHrefs = new Set(rightNodes.map(a => normalizeHref(a.getAttribute("href"))).filter(Boolean));
+
+		// 把左側有、但右側沒有的補進來（舊學期課程）
+		const extraNodes = leftNodes.filter(a => !rightHrefs.has(normalizeHref(a.getAttribute("href"))));
+
+		const nodes = [...rightNodes, ...extraNodes];
 		const seen = new Set();
 		const items = [];
 
@@ -141,15 +160,20 @@
 			const termMatch = raw.match(/【([^】]+)】/);
 			const term = termMatch ? termMatch[1] : "";
 
-			let title = raw
+			// 去掉【學期】前綴與課號後，剩下「中文名稱 英文名稱」
+			const body = raw
 				.replace(/^\s*【[^】]+】\s*/, "")
 				.replace(/^\d+\s*/, "")
-				.replace(/\s+[A-Za-z][\s\S]*$/, "")
 				.trim();
 
-			if (!title) title = raw;
+			// 英文部分：從第一個「空白+大寫英文字母」開始到結尾
+			const enMatch = body.match(/\s+([A-Z].*)$/);
+			const titleEn = enMatch ? enMatch[1].trim() : "";
+			const titleZh = enMatch ? body.slice(0, enMatch.index).trim() : body;
 
-			items.push({ title, href, term });
+			const title = titleZh || raw;
+
+			items.push({ title, titleZh: title, titleEn, href, term });
 		}
 
 		return items;
@@ -231,7 +255,7 @@
 											.map(
 												course => `
                           <a class="e3rp-course-chip" href="${escapeAttr(course.href)}" data-term="${escapeAttr(course.term)}"${course.term !== data.currentTerm ? ' style="display:none"' : ""}>
-                            ${escapeHTML(course.title)}
+                            ${escapeHTML(data.isEnglish && course.titleEn ? course.titleEn : course.titleZh)}
                           </a>
                         `
 											)
