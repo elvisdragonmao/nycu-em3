@@ -5,7 +5,7 @@
 // @name:zh-TW   NYCU EM3 - E3 介面最佳化
 // @name:zh      NYCU EM3 - E3 介面最佳化
 // @namespace    http://tampermonkey.net/
-// @version      1.2.4
+// @version      1.2.5
 // @description  強化 NYCU E3 全站介面與操作體驗。
 // @description:en  Improve NYCU E3 full-site UI/UX.
 // @description:zh-CN  强化 NYCU E3 全站介面与操作体验。
@@ -181,14 +181,15 @@
 
 	function parseAnnouncements() {
 		const posts = [...document.querySelectorAll("#inst20 .post")];
-		return posts.map(post => {
+		const announcements = posts.map(post => {
 			const dateLine = cleanText(post.querySelector(".date")?.textContent);
 			const courseRaw = cleanText(post.querySelector(".date b")?.textContent);
 			const title = cleanText(post.querySelector(".name")?.textContent);
 			const info = cleanText(post.querySelector(".info")?.textContent);
 			const link = normalizeHref(post.querySelector(".info a")?.getAttribute("href"));
 
-			const time = dateLine.replace(courseRaw, "").trim();
+			const rawTime = dateLine.replace(courseRaw, "").trim();
+			const formattedTime = formatRelativeDate(rawTime);
 
 			// 格式：1142.515501.離散數學 Discrete Mathematics → 離散數學
 			// 先去掉「學期代碼.課號.」前綴，再去掉英文名稱
@@ -198,14 +199,32 @@
 					.replace(/\s+[A-Za-z][\s\S]*$/, "") // 去掉英文名稱
 					.trim() || courseRaw;
 
+			// 為了排序，保留原始時間用於解析
+			const timeMatch = rawTime.match(/(\d{1,2})月\s*(\d{1,2})日,(\d{1,2}):(\d{2})/);
+			let sortDate = new Date();
+			if (timeMatch) {
+				const [, month, day, hour, minute] = timeMatch;
+				const currentYear = new Date().getFullYear();
+				sortDate = new Date(currentYear, parseInt(month) - 1, parseInt(day), parseInt(hour), parseInt(minute));
+
+				// 如果解析出來的日期比現在晚，則可能是去年
+				if (sortDate > new Date()) {
+					sortDate = new Date(currentYear - 1, parseInt(month) - 1, parseInt(day), parseInt(hour), parseInt(minute));
+				}
+			}
+
 			return {
 				course,
-				time,
+				time: formattedTime,
 				title,
 				info,
-				href: link || "#"
+				href: link || "#",
+				sortDate
 			};
 		});
+
+		// 按日期排序，最新的在前面
+		return announcements.sort((a, b) => b.sortDate - a.sortDate);
 	}
 
 	function parseEvents() {
@@ -406,6 +425,54 @@
 
 	function escapeHTML(str) {
 		return String(str).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#39;");
+	}
+
+	function formatRelativeDate(dateStr) {
+		// 解析原始日期字串 "03月 16日,15:49"
+		const match = dateStr.match(/(\d{1,2})月\s*(\d{1,2})日,(\d{1,2}):(\d{2})/);
+		if (!match) return dateStr;
+
+		const [,month, day] = match;
+		const now = new Date();
+		const currentYear = now.getFullYear();
+
+		// 假設是當年的日期，如果解析出來的日期比現在晚，則可能是去年
+		let targetDate = new Date(currentYear, parseInt(month) - 1, parseInt(day), 0, 0);
+		if (targetDate > now) {
+			targetDate = new Date(currentYear - 1, parseInt(month) - 1, parseInt(day), 0, 0);
+		}
+
+		const timeDiff = now - targetDate;
+		const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+		const weekdays = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"];
+		const weekday = weekdays[targetDate.getDay()];
+
+		// 如果是今天
+		if (daysDiff === 0) {
+			return `今天`;
+		}
+
+		// 如果是昨天
+		if (daysDiff === 1) {
+			return `昨天 ${weekday}`;
+		}
+
+		if (daysDiff < now.getDay()) {
+			return weekday;
+		}
+
+		if (daysDiff < now.getDay() + 7) {
+			return `${month}/${day} 上${weekday}`;
+		}
+
+		// 超過兩周，按週計算
+		const weeksDiff = Math.floor(daysDiff / 7) + 1;
+		if (weeksDiff < 8) {
+			return `${weeksDiff} 周前${weekday}`;
+		}
+
+		// 超過 8 周，顯示月/日
+		return `${month}/${day}`;
 	}
 
 	function escapeAttr(str) {
