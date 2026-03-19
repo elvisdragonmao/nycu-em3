@@ -83,7 +83,8 @@ a:hover,
 .bg-light,
 .pagelayout-frontpage .theme_boost_union-catlisting > .content > .subcategories,
 .pagelayout-coursecategory .theme_boost_union-catlisting > .content > .subcategories,
-#page-course-search .theme_boost_union-catlisting > .content > .subcategories {
+#page-course-search .theme_boost_union-catlisting > .content > .subcategories,
+.path-mod .activity-header:not(:empty) {
 	background: var(--em-surface) !important;
 	color: var(--em-text) !important;
 	border-color: var(--em-highlight-med) !important;
@@ -98,11 +99,12 @@ a:hover,
 .custom-select,
 select,
 input,
-textarea {
-	background: var(--em-overlay) !important;
-	color: var(--em-text) !important;
-	border-color: var(--em-highlight-high) !important;
-	box-shadow: none !important;
+textarea,
+.content-item-container.unread {
+	background: var(--em-overlay);
+	color: var(--em-text);
+	border-color: var(--em-highlight-high);
+	box-shadow: none;
 }
 
 .btn-primary,
@@ -200,8 +202,17 @@ tr:hover td {
 .secondary-navigation .navigation {
 	border: none;
 }
+
 .secondary-navigation {
 	padding-bottom: 0;
+}
+
+.path-mod-assign td.submissionstatussubmitted,
+.path-mod-assign div.submissionstatussubmitted,
+.path-mod-assign a:link.submissionstatussubmitted,
+.path-mod-assign td.earlysubmission,
+.path-mod-assign div.earlysubmission {
+	background-color: var(--em-foam);
 }
 
 /* ── 重新樣式化 navbar ── */
@@ -226,6 +237,11 @@ tr:hover td {
 .navbar.fixed-top .navbar-brand img.logo {
 	height: 42px !important;
 	width: auto !important;
+}
+
+.content-item-container:hover,
+.content-item-container.unread:hover {
+	background-color: var(--em-highlight-high);
 }
 
 /* avatar 放大 */
@@ -319,7 +335,7 @@ button.btn-close:focus,
 	height: unset;
 }
 
-.drawer-left{
+.drawer-left {
 	position: sticky;
 	top: 112px;
 }

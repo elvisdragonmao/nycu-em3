@@ -201,7 +201,7 @@
 }
 
 .em-profile-card {
-	padding: 26px 30px;
+	padding: 26px 46px;
 	display: grid;
 	grid-template-columns: 90px 1fr;
 	gap: 22px;
